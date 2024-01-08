@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_ibeacon/flutter_ibeacon.dart';
 import 'package:get/get.dart';
 
 class MainPage extends StatelessWidget {
+  RxString eventTime = "".obs;
+  RxString methodTest = "".obs;
   MainPage({super.key});
 
   final _beaconItems = <BeaconItem>[
@@ -25,6 +28,11 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     RxBool isBroadcasting = false.obs;
+    const eventChannel = EventChannel('flutter.hylcreative.top/event');
+    const methodChannel = MethodChannel('flutter.hylcreativ.top/method');
+    Stream<String> eventChannelStream = eventChannel.receiveBroadcastStream().map((event) => event.toString());
+    eventTime.bindStream(eventChannelStream);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('iBeacon Broadcaster'),
@@ -51,6 +59,8 @@ class MainPage extends StatelessWidget {
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Obx(() => Text(eventTime.value)),
+          Obx(() => Text(methodTest.value)),
           Expanded(
               child: Obx(() => ListView.builder(
                   itemCount: _beaconItems.length,
@@ -107,9 +117,10 @@ class MainPage extends StatelessWidget {
                             )));
                   }))),
           ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 // 开启或关闭 beacon 的逻辑
                 isBroadcasting.value = !isBroadcasting.value;
+                methodTest.value = await methodChannel.invokeMethod('test');
               },
               child: Obx(() => Text(
                   isBroadcasting.value ? 'Enable Beacon' : 'Disable Beacon'))),
