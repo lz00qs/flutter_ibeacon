@@ -1,34 +1,45 @@
-import 'flutter_ibeacon_platform_interface.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_ibeacon/beacon_data.dart';
 
 class FlutterIbeacon {
-  Future<String?> getPlatformVersion() {
-    return FlutterIbeaconPlatform.instance.getPlatformVersion();
+  final _eventChannel = const EventChannel('flutter.hylcreative.top/event');
+  final _methodChannel = const MethodChannel('flutter.hylcreative.top/method');
+  final _logChannel = const EventChannel('flutter.hylcreative.top/log');
+
+  FlutterIbeacon() {
+    _logChannel.receiveBroadcastStream().listen((event) {
+      try {
+        final stringArray = List<String>.from(event);
+        final logLevel = stringArray[0];
+        final logMessage = stringArray[1];
+        if (kDebugMode) {
+          debugPrint('[$logLevel] $logMessage');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print(e);
+        }
+      }
+    });
   }
-}
 
-class BeaconItem {
-  String name;
-  String uuid;
-  int major;
-  int minor;
-  String identifier;
+  Stream<bool> isAdvertising() {
+    return _eventChannel.receiveBroadcastStream().cast<bool>();
+  }
 
-  BeaconItem(
-      {required this.name,
-      required this.uuid,
-      required this.major,
-      required this.minor,
-      required this.identifier});
-}
+  Future<void> startAdvertising(BeaconData beaconData) async {
+    Map params = <String, dynamic>{
+      "uuid": beaconData.uuid,
+      "major": beaconData.major,
+      "minor": beaconData.minor,
+      "identifier": beaconData.identifier,
+      "txPower": beaconData.txPower
+    };
+    await _methodChannel.invokeMethod('start', params);
+  }
 
-bool isValidBeaconUUID(String uuid) {
-  RegExp uuidRegex = RegExp(
-      r'^[\dA-Fa-f]{8}-[\dA-Fa-f]{4}-[\dA-Fa-f]{4}-[\dA-Fa-f]{4}-[\dA-Fa-f]{12}$');
-  return uuidRegex.hasMatch(uuid);
-}
-
-bool isValidBeaconIdentifier(String input) {
-  RegExp domainRegex =
-      RegExp(r'^[a-zA-Z\d-]+(\.[a-zA-Z\d-]+)*(\.[a-zA-Z]{2,})$');
-  return domainRegex.hasMatch(input);
+  Future<void> stopAdvertising() async {
+    await _methodChannel.invokeMethod('stop');
+  }
 }

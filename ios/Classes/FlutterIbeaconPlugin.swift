@@ -3,7 +3,8 @@ import UIKit
 
 public enum ChannelName {
     static let event = "flutter.hylcreative.top/event"
-    static let method = "flutter.hylcreativ.top/method"
+    static let method = "flutter.hylcreative.top/method"
+    static let log = "flutter.hylcreative.top/log"
 }
 
 public class FlutterIbeaconPlugin: NSObject, FlutterPlugin {
@@ -23,7 +24,6 @@ public class FlutterIbeaconPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        print("Swift FlutterIbeaconPlugin: received flutter call: \(call.method)")
         switch call.method {
         case "getPlatformVersion":
             result("iOS " + UIDevice.current.systemVersion)

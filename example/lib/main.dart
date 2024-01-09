@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_ibeacon/flutter_ibeacon.dart';
+import 'package:flutter_ibeacon/beacon_data.dart';
 import 'package:flutter_ibeacon_example/main_page.dart';
 import 'package:get/get.dart';
 

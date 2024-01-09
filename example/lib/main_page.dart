@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_ibeacon/beacon_data.dart';
 import 'package:flutter_ibeacon/flutter_ibeacon.dart';
 import 'package:get/get.dart';
 
 class MainPage extends StatelessWidget {
-  RxString eventTime = "".obs;
-  RxString methodTest = "".obs;
+  final RxString eventTime = "".obs;
+  final RxString methodTest = "".obs;
+  final iBeacon = FlutterIbeacon();
   MainPage({super.key});
 
-  final _beaconItems = <BeaconItem>[
-    BeaconItem(
+  final _beaconItems = <BeaconData>[
+    BeaconData(
         name: "Default",
         uuid: "39ED98FF-2900-441A-802F-9C398FC199D2",
         major: 100,
         minor: 1,
         identifier: "top.hylcreative.beacon"),
-    BeaconItem(
+    BeaconData(
         name: "Default2",
         uuid: "39ED98FF-2900-441A-802F-9C398FC199D2",
         major: 100,
@@ -28,10 +29,10 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     RxBool isBroadcasting = false.obs;
-    const eventChannel = EventChannel('flutter.hylcreative.top/event');
-    const methodChannel = MethodChannel('flutter.hylcreativ.top/method');
-    Stream<String> eventChannelStream = eventChannel.receiveBroadcastStream().map((event) => event.toString());
-    eventTime.bindStream(eventChannelStream);
+    // const eventChannel = EventChannel('flutter.hylcreative.top/event');
+    // const methodChannel = MethodChannel('flutter.hylcreativ.top/method');
+    // Stream<String> eventChannelStream = eventChannel.receiveBroadcastStream().map((event) => event.toString());
+    // eventTime.bindStream(eventChannelStream);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +43,7 @@ class MainPage extends StatelessWidget {
                 // 添加 beacon item 逻辑
                 final result = await Get.dialog(BeaconDialog(
                     isAdd: false,
-                    item: BeaconItem(
+                    item: BeaconData(
                         name: 'New Item',
                         uuid: '39ED98FF-2900-441A-802F-9C398FC199D',
                         major: 0,
@@ -120,7 +121,8 @@ class MainPage extends StatelessWidget {
               onPressed: () async {
                 // 开启或关闭 beacon 的逻辑
                 isBroadcasting.value = !isBroadcasting.value;
-                methodTest.value = await methodChannel.invokeMethod('test');
+                await iBeacon.startAdvertising(_beaconItems[_beaconBroadcasting.value]);
+                // methodTest.value = await methodChannel.invokeMethod('test');
               },
               child: Obx(() => Text(
                   isBroadcasting.value ? 'Enable Beacon' : 'Disable Beacon'))),
@@ -135,7 +137,7 @@ class MainPage extends StatelessWidget {
 
 class BeaconDialog extends StatelessWidget {
   final bool isAdd;
-  final BeaconItem item;
+  final BeaconData item;
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController uuidController = TextEditingController();
@@ -224,7 +226,7 @@ class BeaconDialog extends StatelessWidget {
                     onPressed: () {
                       if (isValidBeaconUUID(uuid.value) &&
                           isValidBeaconIdentifier(identifier.value)) {
-                        BeaconItem newItem = BeaconItem(
+                        BeaconData newItem = BeaconData(
                           name: nameController.text,
                           uuid: uuidController.text,
                           major: int.parse(majorController.text),

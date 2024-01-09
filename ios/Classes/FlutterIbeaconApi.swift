@@ -1,18 +1,53 @@
 import Flutter
 import UIKit
+import CoreLocation
 
 class FlutterIbeaconApi: NSObject{
     private var eventSink: FlutterEventSink?
     private var timer = Timer()
-    
-    //    private let messenger: FlutterBinaryMessenger
+    private let log = Logger()
     
     init(messenger: FlutterBinaryMessenger) {
-        //        self.messenger = messenger
         super.init()
         initChannels(messenger: messenger)
     }
 }
+
+private class Logger : NSObject, FlutterStreamHandler {
+    private var eventSink: FlutterEventSink?
+    
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        eventSink = events
+        return nil
+    }
+    
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        eventSink = nil
+        return nil
+    }
+    
+    private func sendStringArray(_ stringArray: [String]) {
+        eventSink?(stringArray)
+    }
+    
+    func d(_ text: String) {
+        sendStringArray(["Debug", "iOS: \(text)"])
+    }
+    
+    func i(_ text: String) {
+        sendStringArray(["Info", "iOS: \(text)"])
+    }
+    
+    func w(_ text: String) {
+        sendStringArray(["Warning", "iOS: \(text)"])
+    }
+    
+    func e(_ text: String) {
+        sendStringArray(["Error", "iOS: \(text)"])
+    }
+}
+
+
 
 private extension FlutterIbeaconApi {
     private func initChannels(messenger: FlutterBinaryMessenger) {
@@ -20,6 +55,7 @@ private extension FlutterIbeaconApi {
             .setStreamHandler(self)
         FlutterMethodChannel(name: ChannelName.method, binaryMessenger: messenger)
             .setMethodCallHandler(methodCallHandler)
+        FlutterEventChannel(name: ChannelName.log, binaryMessenger: messenger).setStreamHandler(log)
     }
     
 }
@@ -28,7 +64,6 @@ extension FlutterIbeaconApi: FlutterStreamHandler {
     
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        print("onListen....")
         self.eventSink = events
         
         self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
@@ -55,6 +90,12 @@ private extension FlutterIbeaconApi {
         switch call.method {
         case "test":
             result("iOS " + UIDevice.current.systemVersion)
+        case "start":
+            let map = call.arguments as? Dictionary<String, Any>
+            if map != nil {
+                log.d("\(map!)")
+            }
+            result(nil)
         default:
             result(FlutterMethodNotImplemented)
         }
