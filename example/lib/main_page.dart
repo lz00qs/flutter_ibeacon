@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ibeacon/beacon_data.dart';
 import 'package:flutter_ibeacon/flutter_ibeacon.dart';
+import 'package:flutter_ibeacon_example/IbeaconController.dart';
 import 'package:get/get.dart';
 
 class MainPage extends StatelessWidget {
   final RxString eventTime = "".obs;
   final RxString methodTest = "".obs;
-  final iBeacon = FlutterIbeacon();
-  final RxBool _isBroadcasting = false.obs;
+  final IbeaconController controller = Get.find();
 
   MainPage({super.key});
 
@@ -116,13 +116,17 @@ class MainPage extends StatelessWidget {
           ElevatedButton(
               onPressed: () async {
                 // 开启或关闭 beacon 的逻辑
-                _isBroadcasting.value = !_isBroadcasting.value;
-                await iBeacon
-                    .startAdvertising(_beaconItems[_beaconBroadcasting.value]);
+                if (controller.isAdvertising.value == false) {
+                  await controller.flutterIbeacon.startAdvertising(
+                      _beaconItems[_beaconBroadcasting.value]);
+                } else {
+                  await controller.flutterIbeacon.stopAdvertising();
+                }
                 // methodTest.value = await methodChannel.invokeMethod('test');
               },
-              child: Obx(() => Text(
-                  _isBroadcasting.value ? 'Enable Beacon' : 'Disable Beacon'))),
+              child: Obx(() => Text(!controller.isAdvertising.value
+                  ? 'Enable Beacon'
+                  : 'Disable Beacon'))),
           const SizedBox(
             height: 50,
           )

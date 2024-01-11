@@ -5,7 +5,7 @@ import CoreBluetooth
 
 class FlutterIbeaconApi: NSObject, CBPeripheralManagerDelegate{
     private var peripheralManager: CBPeripheralManager!
-    private var eventSink: FlutterEventSink?
+    private var isAdvHandler = IsAdvHandler()
     private var timer = Timer()
     private let log = Logger()
     private var beaconReadyHandler: BeaconReadyHandler!
@@ -93,7 +93,7 @@ private class BeaconReadyHandler: NSObject, FlutterStreamHandler {
 private extension FlutterIbeaconApi {
     private func initChannels(messenger: FlutterBinaryMessenger) {
         FlutterEventChannel(name: ChannelName.advertisingStatus, binaryMessenger: messenger)
-            .setStreamHandler(self)
+            .setStreamHandler(isAdvHandler)
         FlutterEventChannel(name: ChannelName.beaconReady, binaryMessenger: messenger)
             .setStreamHandler(beaconReadyHandler)
         FlutterMethodChannel(name: ChannelName.method, binaryMessenger: messenger)
@@ -103,39 +103,21 @@ private extension FlutterIbeaconApi {
     
 }
 
-extension FlutterIbeaconApi: FlutterStreamHandler {
-    
+private class IsAdvHandler: NSObject, FlutterStreamHandler {
+    var eventSink: FlutterEventSink?
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        self.eventSink = events
-        
-        self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
-            let dateFormat = DateFormatter()
-            dateFormat.dateFormat = "HH:mm:ss"
-            let time = dateFormat.string(from: Date())
-            if self.eventSink != nil {
-                self.eventSink!(time)
-            }
-        })
-        
+        eventSink = events
         return nil
     }
     
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        self.eventSink = nil
+        eventSink = nil
         return nil
     }
 }
 
 private extension FlutterIbeaconApi {
-    private func checkPermission() {
-        if let permission = Bundle.main.infoDictionary?["NSBluetoothAlwaysUsageDescription"] as? String {
-            log.d("App拥有NSBluetoothAlwaysUsageDescription权限描述: \(permission)")
-        } else {
-            log.d("App没有NSBluetoothAlwaysUsageDescription权限描述")
-        }
-    }
-    
     
     private func methodCallHandler(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         print("Swift FlutterIbeaconPlugin: received flutter call: \(call.method)")
@@ -144,13 +126,49 @@ private extension FlutterIbeaconApi {
             result("iOS " + UIDevice.current.systemVersion)
         case "start":
             let map = call.arguments as? Dictionary<String, Any>
-            //            if map != nil {
-            //                log.d("\(map!)")
-            //            }
-            checkPermission()
+            if map != nil {
+                let region = try? safeCreateCLBeaconRegion(map!)
+                let txPower = map?["txPower"] as? NSNumber
+                if region != nil {
+                    let beaconPeripheralData = region?.peripheralData(withMeasuredPower: txPower)
+                    if beaconPeripheralData != nil {
+                        peripheralManager.startAdvertising(((beaconPeripheralData! as NSDictionary) as! [String : Any]))
+                        log.d("Advertising!!!")
+                        self.isAdvHandler.eventSink?(true)
+                    }
+                }
+            }
+            
+            result(nil)
+        case "stop":
+            peripheralManager.stopAdvertising()
+            self.isAdvHandler.eventSink?(false)
             result(nil)
         default:
             result(FlutterMethodNotImplemented)
         }
+    }
+    
+    func safeCreateCLBeaconRegion(_ map: Dictionary<String, Any>) throws -> CLBeaconRegion? {
+        let proximityUUIDString = map["uuid"] as? String
+        let majorInt = map["major"] as? Int
+        let minorInt = map["minor"] as? Int
+        let identifier = map["identifier"] as? String
+        
+        if (proximityUUIDString != nil) && (majorInt != nil) && (minorInt != nil) && (identifier != nil) {
+            let proximityUUID = UUID(uuidString: proximityUUIDString!)
+            let major = CLBeaconMajorValue(majorInt!)
+            let minor = CLBeaconMinorValue(minorInt!)
+            if (proximityUUID != nil) {
+                return CLBeaconRegion(proximityUUID: proximityUUID!, major: major, minor: minor, identifier: identifier!)
+            }
+        }
+        return nil
+    }
+}
+
+private extension FlutterIbeaconApi {
+    private func startBeaconing(_ region: CLBeaconRegion) {
+        
     }
 }
