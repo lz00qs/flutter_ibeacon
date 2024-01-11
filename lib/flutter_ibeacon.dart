@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ibeacon/beacon_data.dart';
 
 class FlutterIbeacon {
-  final _eventChannel = const EventChannel('flutter.hylcreative.top/event');
+  final _advertisingStatusChannel =
+      const EventChannel('flutter.hylcreative.top/status');
+  final _beaconReadyChannel =
+      const EventChannel('flutter.hylcreative.top/ready');
   final _methodChannel = const MethodChannel('flutter.hylcreative.top/method');
   final _logChannel = const EventChannel('flutter.hylcreative.top/log');
 
@@ -25,7 +30,25 @@ class FlutterIbeacon {
   }
 
   Stream<bool> isAdvertising() {
-    return _eventChannel.receiveBroadcastStream().cast<bool>();
+    return _advertisingStatusChannel.receiveBroadcastStream().cast<bool>();
+  }
+
+  Stream<List<String>> isBeaconReady() {
+    StreamController<List<String>> controller =
+        StreamController<List<String>>();
+    _beaconReadyChannel.receiveBroadcastStream().listen((event) {
+      try {
+        final stringArray = List<String>.from(event);
+        controller.add(stringArray);
+      } catch (e) {
+        if (kDebugMode) {
+          print(e);
+        }
+      }
+    }, onDone: () {
+      controller.close();
+    });
+    return controller.stream;
   }
 
   Future<void> startAdvertising(BeaconData beaconData) async {

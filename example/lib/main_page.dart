@@ -7,6 +7,8 @@ class MainPage extends StatelessWidget {
   final RxString eventTime = "".obs;
   final RxString methodTest = "".obs;
   final iBeacon = FlutterIbeacon();
+  final RxBool _isBroadcasting = false.obs;
+
   MainPage({super.key});
 
   final _beaconItems = <BeaconData>[
@@ -28,12 +30,6 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    RxBool isBroadcasting = false.obs;
-    // const eventChannel = EventChannel('flutter.hylcreative.top/event');
-    // const methodChannel = MethodChannel('flutter.hylcreativ.top/method');
-    // Stream<String> eventChannelStream = eventChannel.receiveBroadcastStream().map((event) => event.toString());
-    // eventTime.bindStream(eventChannelStream);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('iBeacon Broadcaster'),
@@ -120,12 +116,13 @@ class MainPage extends StatelessWidget {
           ElevatedButton(
               onPressed: () async {
                 // 开启或关闭 beacon 的逻辑
-                isBroadcasting.value = !isBroadcasting.value;
-                await iBeacon.startAdvertising(_beaconItems[_beaconBroadcasting.value]);
+                _isBroadcasting.value = !_isBroadcasting.value;
+                await iBeacon
+                    .startAdvertising(_beaconItems[_beaconBroadcasting.value]);
                 // methodTest.value = await methodChannel.invokeMethod('test');
               },
               child: Obx(() => Text(
-                  isBroadcasting.value ? 'Enable Beacon' : 'Disable Beacon'))),
+                  _isBroadcasting.value ? 'Enable Beacon' : 'Disable Beacon'))),
           const SizedBox(
             height: 50,
           )

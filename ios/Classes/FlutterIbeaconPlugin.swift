@@ -2,7 +2,8 @@ import Flutter
 import UIKit
 
 public enum ChannelName {
-    static let event = "flutter.hylcreative.top/event"
+    static let advertisingStatus = "flutter.hylcreative.top/status"
+    static let beaconReady = "flutter.hylcreative.top/ready"
     static let method = "flutter.hylcreative.top/method"
     static let log = "flutter.hylcreative.top/log"
 }

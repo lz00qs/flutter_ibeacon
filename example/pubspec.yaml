@@ -17,6 +17,7 @@ dependencies:
   get:
   flutter:
     sdk: flutter
+  permission_handler: ^11.1.0
 
   flutter_ibeacon:
     # When depending on this package from a real application you should use:
