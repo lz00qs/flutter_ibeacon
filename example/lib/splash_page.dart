@@ -12,6 +12,7 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     IbeaconController controller = Get.find();
+    controller.flutterIbeacon.getReadyStatus();
     return Obx(() => controller.isBeaconReady[0] == "true"
         ? MainPage()
         : const RequestPage());

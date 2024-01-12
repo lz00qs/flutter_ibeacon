@@ -1,3 +1,5 @@
+export 'beacon_data.dart';
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -64,5 +66,9 @@ class FlutterIbeacon {
 
   Future<void> stopAdvertising() async {
     await _methodChannel.invokeMethod('stop');
+  }
+
+  Future<void> getReadyStatus() async {
+    await _methodChannel.invokeMethod('ready');
   }
 }

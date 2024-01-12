@@ -144,6 +144,25 @@ private extension FlutterIbeaconApi {
             peripheralManager.stopAdvertising()
             self.isAdvHandler.eventSink?(false)
             result(nil)
+        case "ready":
+            if beaconReadyHandler.eventSink != nil {
+                var status = ["false",""]
+                switch self.peripheralManager.state {
+                case .poweredOn:
+                    status[0] = "true"
+                case .poweredOff:
+                    status[1] = "disabled"
+                case .unauthorized:
+                    status[1] = "unauthorized"
+                case .unsupported:
+                    status[1] = "unsupported"
+                default:
+                    status[1] = "unknowError"
+                }
+                self.log.d("\(status)")
+                beaconReadyHandler.eventSink?(status)
+            }
+            result(nil)
         default:
             result(FlutterMethodNotImplemented)
         }
