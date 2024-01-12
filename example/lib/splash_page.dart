@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_ibeacon_example/IbeaconController.dart';
+import 'package:flutter_ibeacon_example/ibeacon_controller.dart';
 import 'package:flutter_ibeacon_example/request_page.dart';
 import 'package:get/get.dart';
 

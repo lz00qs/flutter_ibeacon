@@ -1,10 +1,7 @@
-export 'beacon_data.dart';
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_ibeacon/beacon_data.dart';
 
 class FlutterIbeacon {
   final _advertisingStatusChannel =
@@ -53,13 +50,14 @@ class FlutterIbeacon {
     return controller.stream;
   }
 
-  Future<void> startAdvertising(BeaconData beaconData) async {
+  Future<void> startAdvertising({required String uuid, required int major, required int minor, required String identifier,
+      int? txPower}) async {
     Map params = <String, dynamic>{
-      "uuid": beaconData.uuid,
-      "major": beaconData.major,
-      "minor": beaconData.minor,
-      "identifier": beaconData.identifier,
-      "txPower": beaconData.txPower
+      "uuid": uuid,
+      "major": major,
+      "minor": minor,
+      "identifier": identifier,
+      "txPower": txPower
     };
     await _methodChannel.invokeMethod('start', params);
   }
@@ -71,4 +69,16 @@ class FlutterIbeacon {
   Future<void> getReadyStatus() async {
     await _methodChannel.invokeMethod('ready');
   }
+}
+
+bool isValidBeaconUUID(String uuid) {
+  RegExp uuidRegex = RegExp(
+      r'^[\dA-Fa-f]{8}-[\dA-Fa-f]{4}-[\dA-Fa-f]{4}-[\dA-Fa-f]{4}-[\dA-Fa-f]{12}$');
+  return uuidRegex.hasMatch(uuid);
+}
+
+bool isValidBeaconIdentifier(String input) {
+  RegExp domainRegex =
+  RegExp(r'^[a-zA-Z\d-]+(\.[a-zA-Z\d-]+)*(\.[a-zA-Z]{2,})$');
+  return domainRegex.hasMatch(input);
 }

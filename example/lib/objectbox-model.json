@@ -1,0 +1,62 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:7427985273005259455",
+      "lastPropertyId": "7:4852523580905527295",
+      "name": "BeaconData",
+      "properties": [
+        {
+          "id": "1:6624827547859806446",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3234073911127994447",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:5725523020594613041",
+          "name": "uuid",
+          "type": 9
+        },
+        {
+          "id": "4:4057326130865413373",
+          "name": "major",
+          "type": 6
+        },
+        {
+          "id": "5:7910743605513419242",
+          "name": "minor",
+          "type": 6
+        },
+        {
+          "id": "6:9049354517532863002",
+          "name": "identifier",
+          "type": 9
+        },
+        {
+          "id": "7:4852523580905527295",
+          "name": "txPower",
+          "type": 6
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "1:7427985273005259455",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

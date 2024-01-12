@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'IbeaconController.dart';
+import 'package:flutter_ibeacon_example/ibeacon_controller.dart';
 
 class RequestPage extends StatelessWidget {
   const RequestPage({Key? key}) : super(key: key);
