@@ -179,7 +179,7 @@ private extension FlutterIbeaconApi {
             let major = CLBeaconMajorValue(majorInt!)
             let minor = CLBeaconMinorValue(minorInt!)
             if (proximityUUID != nil) {
-                return CLBeaconRegion(proximityUUID: proximityUUID!, major: major, minor: minor, identifier: identifier!)
+                return CLBeaconRegion(uuid: proximityUUID!, major: major, minor: minor, identifier: identifier!)
             }
         }
         return nil
