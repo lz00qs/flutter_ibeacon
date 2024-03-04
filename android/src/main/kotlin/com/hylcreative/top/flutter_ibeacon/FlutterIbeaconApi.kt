@@ -111,7 +111,7 @@ class FlutterIbeaconApi(context: Context, binaryMessenger: BinaryMessenger) :
             .array()
         payload += ByteBuffer.allocate(2).order(ByteOrder.BIG_ENDIAN).putShort(minor.toShort())
             .array()
-        payload += 0xc5.toByte()
+        payload += (-txPower).toByte()
 
         val settings: AdvertiseSettings = AdvertiseSettings.Builder()
             .setConnectable(false)
