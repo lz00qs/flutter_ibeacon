@@ -31,6 +31,18 @@ class RequestPage extends StatelessWidget {
                           Text(text.value),
                           ElevatedButton(
                             onPressed: () async {
+                              await Permission.bluetoothConnect
+                                  .onDeniedCallback(() {
+                                Fluttertoast.showToast(
+                                    msg: 'Permission denied!');
+                              }).onGrantedCallback(() {
+                                Fluttertoast.showToast(
+                                    msg: 'Permission granted!');
+                              }).onPermanentlyDeniedCallback(() {
+                                Fluttertoast.showToast(
+                                    msg: 'Permission permanently denied!');
+                                openAppSettings();
+                              }).request();
                               await Permission.bluetoothAdvertise
                                   .onDeniedCallback(() {
                                 Fluttertoast.showToast(
