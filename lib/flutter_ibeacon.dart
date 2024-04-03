@@ -9,10 +9,10 @@ class FlutterIbeacon {
   final _beaconReadyChannel =
       const EventChannel('flutter.hylcreative.top/ready');
   final _methodChannel = const MethodChannel('flutter.hylcreative.top/method');
-  final _logChannel = const EventChannel('flutter.hylcreative.top/log');
+  final logChannel = const EventChannel('flutter.hylcreative.top/log');
 
   FlutterIbeacon() {
-    _logChannel.receiveBroadcastStream().listen((event) {
+    logChannel.receiveBroadcastStream().listen((event) {
       try {
         final stringArray = List<String>.from(event);
         final logLevel = stringArray[0];
@@ -50,7 +50,11 @@ class FlutterIbeacon {
     return controller.stream;
   }
 
-  Future<void> startAdvertising({required String uuid, required int major, required int minor, required String identifier,
+  Future<void> startAdvertising(
+      {required String uuid,
+      required int major,
+      required int minor,
+      required String identifier,
       int? txPower}) async {
     Map params = <String, dynamic>{
       "uuid": uuid,
@@ -79,6 +83,6 @@ bool isValidBeaconUUID(String uuid) {
 
 bool isValidBeaconIdentifier(String input) {
   RegExp domainRegex =
-  RegExp(r'^[a-zA-Z\d-]+(\.[a-zA-Z\d-]+)*(\.[a-zA-Z]{2,})$');
+      RegExp(r'^[a-zA-Z\d-]+(\.[a-zA-Z\d-]+)*(\.[a-zA-Z]{2,})$');
   return domainRegex.hasMatch(input);
 }
